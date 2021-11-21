@@ -10,9 +10,9 @@ struct user {
     double sum;
 };
 
-char menuDisplay(char menu, char *choice){  //menu can take p (for principal menu), o(opérations), a(affichage), f(fidélisation)
+void menuDisplay(char menu, char *choice){  //menu can take p (for principal menu), o(opérations), a(affichage), f(fidélisation)
     //printf("\n choice in menu function %c", *choice);
-    printf("******** Bank's Accounts Management System *******\n");
+    printf("\n******** Bank's Accounts Management System *******\n");
     switch(menu)
     {
         case 'p' :
@@ -20,16 +20,16 @@ char menuDisplay(char menu, char *choice){  //menu can take p (for principal men
             scanf(" %c", choice);
             break;
         case 'o' :
-            printf("\n1. Retrait\n2. Dépôt\n3. Retourner au menu principal\n4. Quitter");
+            printf("\n1. Retrait\n2. Dépôt\n3. Retourner au menu principal\n4. Quitter\n");
             scanf(" %c", choice);
             break;
         case 'a' :
-            printf("\n1. Par Ordre Ascendant\n2. Par Ordre Descendant\n3. Montant > ?\n4. Recherche par CIN\n5. Retourner au menu principal\n6. Quitter"); //Don't forget to add another submenu for ascending and descending
+            printf("\n1. Par Ordre Ascendant\n2. Par Ordre Descendant\n3. Montant > ? Ordre Ascendant\n4. Montant > ? Ordre Descendant\n5. Recherche par CIN\n6. Retourner au menu principal\n7. Quitter\n"); //Don't forget to add another submenu for ascending and descending
             scanf(" %c", choice);
             //if(choice == '6') return '6';
             break;
         case 'f' :
-            printf("\nVoulez vous ajoutez aux 3 comptes ayant les montants les plus supérieurs 1.3%? Y/N:"); //Try to display the 3 accounts first
+            printf("\nVoulez vous ajoutez aux 3 comptes ayant les montants les plus supérieurs 1.3%? Y/N:  "); //Try to display the 3 accounts first
             scanf(" %c", choice);
             break;
     }
@@ -38,7 +38,7 @@ char menuDisplay(char menu, char *choice){  //menu can take p (for principal men
 }
 
 bool createAccounts(int currentCount, int accountsNum, struct user *pStruct){
-    printf("\ncurrentCount : %d, and accountsNum to add is : %d ", currentCount, accountsNum);
+    //printf("\ncurrentCount : %d, and accountsNum to add is : %d ", currentCount, accountsNum);
     //int i = 0;
     struct user *ptrStartOfStructArray = pStruct;
     pStruct += currentCount;
@@ -64,18 +64,108 @@ bool createAccounts(int currentCount, int accountsNum, struct user *pStruct){
     */
     return true;
 }
-void withdrawal(){}
+void withdraw(){}
 void deposit(){}
 
 bool operations(){ // Withdraw and deposit operations on accounts
     char choice;
-    choice = menuDisplay('o', &choice);
-    if(choice == '1') withdrawal();
+    menuDisplay('o', &choice);
+    if(choice == '1') withdraw();
     else if (choice == '2') deposit();
     else if (choice == '3') return true;
     return true;
 }
-bool affichage(){
+void swap(double *ptrSwap1, double *ptrSwap2)
+{
+    double temp = *ptrSwap1;
+    *ptrSwap1 = *ptrSwap2;
+    *ptrSwap2 = temp;
+}
+void selectionSortDouble(char sortBy, double minSumToDisplay, struct user *userAccounts, int currentCount){
+    struct user *userAccountToBeSwaped;
+    int i, j, min_idx, max_idx;
+    if(sortBy == 'a') {
+        for (i = 0; i < currentCount-1; i++){ // we did sizeArr-1 because it is not necessary for i to get to the last element of the array
+            min_idx = i;
+            for (j = i+1; j < currentCount; j++){
+                if (userAccounts->sum > (userAccounts++)->sum);
+                    min_idx = j;
+            }
+            userAccounts -= (j - 1);
+            userAccountToBeSwaped = userAccounts + i;
+            userAccounts += min_idx;
+            swap(&userAccountToBeSwaped->sum, &userAccounts->sum);
+        }
+        userAccounts -= min_idx;
+        //printf("%s\t|\t%s\t|\t%s\t|\t%lf", userAccounts->lName, userAccounts->fName, userAccounts->CIN, userAccounts->sum);
+    }
+    else if (sortBy == 'd'){
+        for (i = 0; i < currentCount-1; i++){
+            max_idx = i;
+            for (j = i+1; j < currentCount; j++){
+                if (userAccounts->sum < (userAccounts++)->sum);
+                    max_idx = j;
+            }
+            userAccounts -= (j - 1);
+            userAccountToBeSwaped = userAccounts + i;
+            userAccounts += max_idx;
+            swap(&userAccountToBeSwaped->sum, &userAccounts->sum);
+        }
+        userAccounts -= max_idx;
+        //printf("%s\t|\t%s\t|\t%s\t|\t%lf", userAccounts->lName, userAccounts->fName, userAccounts->CIN, userAccounts->sum);
+    }
+    //affichage
+    printf("\nNom\t|\tPrenom\t|\tCIN\t|\tMontant");
+    for (i = 0; i < currentCount; i++){
+        printf("\n%s\t|\t%s\t|\t%s\t|\t%lf", userAccounts->lName, userAccounts->fName, userAccounts->CIN, userAccounts->sum);
+        userAccounts++;
+    }
+};
+void sortFunction(char *subChoice, char sortBy, double minSumToDisplay, struct user *userAccounts, int currentCount){
+    switch(*subChoice){
+        case '1':
+            selectionSortDouble(sortBy, minSumToDisplay, userAccounts, currentCount);
+            break;
+        case '2' :
+            //selectionSortString(sortBy, *subChoice, userAccounts, currentCount);
+            break;
+        case '3' :
+            //selectionSortString(sortBy, *subChoice, userAccounts, currentCount);
+            break;
+    }
+}
+bool affichage(char choice, struct user *userAccounts, int currentCount){
+    char subChoice;
+    double minSumToDisplay = 0.0;
+    switch(choice){
+        case '1': //Trier en ascendant
+            printf("\nTrier en ascendant par :\n1. Montant \n2. Nom \n3. Prenom\n");
+            scanf(" %c", &subChoice);
+            sortFunction(&subChoice, 'a', minSumToDisplay, userAccounts, currentCount); //Pass the sub choice and the operation to perform ascending or descending
+            break;
+        case '2': //Trier en descendant
+            printf("\nTrier en descendant par :\n1. Montant \n2. Nom \n3. Prenom\n");
+            scanf(" %c", &subChoice);
+            sortFunction(&subChoice, 'd', minSumToDisplay, userAccounts, currentCount); //Pass the sub choice and the operation to perform ascending or descending
+            break;
+        case '3':  // Montant > ? Ordre Ascendant
+            printf("\nEntrer le montant minimum à afficher\n");
+            scanf(" %d", &minSumToDisplay);
+            subChoice = '1';
+            sortFunction(&subChoice, 'a', minSumToDisplay, userAccounts, currentCount);
+        case '4': // Montant > ? Ordre Descendant
+            printf("\nEntrer le montant minimum à afficher\n");
+            scanf(" %d", &minSumToDisplay);
+            subChoice = '1';
+            sortFunction(&subChoice, 'd', minSumToDisplay, userAccounts, currentCount);
+        case '5': // Recherche par CIN
+            //searchCIN();
+        case '6': //Retourn to principal menu
+            system("cls");
+            return true;
+
+    }
+    return true;
 }
 bool loyalty(){ //fidélisation des clients
 }
@@ -129,7 +219,9 @@ void main(){
             repeat = operations();
             break;
         case '4':
-            repeat = affichage();
+            menuDisplay('a', &choice);
+            if(choice == '7') repeat = false;
+            repeat = affichage(choice, userAccounts, i);
             break;
         case '5':
             repeat = loyalty();
