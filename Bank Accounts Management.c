@@ -117,7 +117,13 @@ void selectionSortDouble(char sortBy, double minSumToDisplay, struct user *userA
     //affichage
     printf("\nNom\t|\tPrenom\t|\tCIN\t|\tMontant");
     for (i = 0; i < currentCount; i++){
-        printf("\n%s\t|\t%s\t|\t%s\t|\t%lf", userAccounts->lName, userAccounts->fName, userAccounts->CIN, userAccounts->sum);
+        if(userAccounts->sum > minSumToDisplay){
+            for (i ; i < currentCount; i++){
+                printf("\n%s\t|\t%s\t|\t%s\t|\t%lf", userAccounts->lName, userAccounts->fName, userAccounts->CIN, userAccounts->sum);
+                userAccounts++;
+            }
+            break;
+        }
         userAccounts++;
     }
 };
@@ -149,17 +155,20 @@ bool affichage(char choice, struct user *userAccounts, int currentCount){
             sortFunction(&subChoice, 'd', minSumToDisplay, userAccounts, currentCount); //Pass the sub choice and the operation to perform ascending or descending
             break;
         case '3':  // Montant > ? Ordre Ascendant
-            printf("\nEntrer le montant minimum à afficher\n");
-            scanf(" %d", &minSumToDisplay);
+            printf("\nEntrer le montant minimum a afficher\n");
+            scanf(" %lf", &minSumToDisplay);
             subChoice = '1';
             sortFunction(&subChoice, 'a', minSumToDisplay, userAccounts, currentCount);
+            break;
         case '4': // Montant > ? Ordre Descendant
-            printf("\nEntrer le montant minimum à afficher\n");
-            scanf(" %d", &minSumToDisplay);
+            printf("\nEntrer le montant minimum a afficher\n");
+            scanf(" %lf", &minSumToDisplay);
             subChoice = '1';
             sortFunction(&subChoice, 'd', minSumToDisplay, userAccounts, currentCount);
+            break;
         case '5': // Recherche par CIN
             //searchCIN();
+            break;
         case '6': //Retourn to principal menu
             system("cls");
             return true;
