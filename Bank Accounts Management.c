@@ -20,7 +20,7 @@ void menuDisplay(char menu, char *choice){  //menu can take p (for principal men
             scanf(" %c", choice);
             break;
         case 'o' :
-            printf("\n1. Retrait\n2. Dépôt\n3. Retourner au menu principal\n4. Quitter\n");
+            printf("\n1. Retrait\n2. Depot\n3. Retourner au menu principal\n4. Quitter\n");
             scanf(" %c", choice);
             break;
         case 'a' :
@@ -82,34 +82,46 @@ void swap(double *ptrSwap1, double *ptrSwap2)
     *ptrSwap2 = temp;
 }
 void selectionSortDouble(char sortBy, double minSumToDisplay, struct user *userAccounts, int currentCount){
+    //printf("\n%s\t|\t%s\t|\t%s\t|\t%lf", userAccounts->lName, userAccounts->fName, userAccounts->CIN, userAccounts->sum);
+    //printf("\n%s\t|\t%s\t|\t%s\t|\t%lf", (userAccounts+1)->lName, (userAccounts+1)->fName, (userAccounts+1)->CIN, (userAccounts+1)->sum);
+    //printf("\n%s\t|\t%s\t|\t%s\t|\t%lf", (userAccounts+2)->lName, (userAccounts+2)->fName, (userAccounts+2)->CIN, (userAccounts+2)->sum);
+
+
     struct user *userAccountToBeSwaped;
+    struct user *userAccountsStartingPoint = userAccounts;
     int i, j, min_idx, max_idx;
+
+
     //affichage
     printf("\nNom\t|\tPrenom\t|\tCIN\t|\tMontant");
     if(sortBy == 'a') {
         for (i = 0; i < currentCount-1; i++){ // we did sizeArr-1 because it is not necessary for i to get to the last element of the array
             min_idx = i;
             for (j = i+1; j < currentCount; j++){
-                if (userAccounts->sum > (userAccounts++)->sum);
+                if ((userAccounts+min_idx)->sum > (userAccountsStartingPoint+j)->sum);
                     min_idx = j;
             }
-            userAccounts -= (j - 1);
-            userAccountToBeSwaped = userAccounts + i;
             userAccounts += min_idx;
+            //userAccounts -= ((currentCount -1) - (j-1)) ; //j-1 is equivalent to currentCount -1??
+            userAccountToBeSwaped = userAccountsStartingPoint + i;
+            //userAccounts += min_idx;
+            //userAccounts = userAccountsStartingPoint + min_idx;
             swap(&userAccountToBeSwaped->sum, &userAccounts->sum);
+            userAccounts -= min_idx;
         }
-        userAccounts -= min_idx;
-        //printf("%s\t|\t%s\t|\t%s\t|\t%lf", userAccounts->lName, userAccounts->fName, userAccounts->CIN, userAccounts->sum);
+        //userAccounts -= min_idx;
+        //printf("\n%s\t|\t%s\t|\t%s\t|\t%lf", (userAccounts+3)->lName, (userAccounts+3)->fName, (userAccounts+3)->CIN, (userAccounts+3)->sum);
+        //printf("\n%s\t|\t%s\t|\t%s\t|\t%lf", userAccounts->lName, userAccounts->fName, userAccounts->CIN, userAccounts->sum);
         //Display of user accounts in ascending order
         for (i = 0; i < currentCount; i++){
-            if(userAccounts->sum > minSumToDisplay){
+            if(userAccountsStartingPoint->sum > minSumToDisplay){
                 for (i ; i < currentCount; i++){
-                    printf("\n%s\t|\t%s\t|\t%s\t|\t%lf", userAccounts->lName, userAccounts->fName, userAccounts->CIN, userAccounts->sum);
-                    userAccounts++;
+                    printf("\n%s\t|\t%s\t|\t%s\t|\t%lf", userAccountsStartingPoint->lName, userAccountsStartingPoint->fName, userAccountsStartingPoint->CIN, userAccountsStartingPoint->sum);
+                    userAccountsStartingPoint++;
                 }
-            break;
+                break;
             }
-        userAccounts++;
+            userAccountsStartingPoint++;
         }
     }
     else if (sortBy == 'd'){
@@ -125,7 +137,8 @@ void selectionSortDouble(char sortBy, double minSumToDisplay, struct user *userA
             swap(&userAccountToBeSwaped->sum, &userAccounts->sum);
         }
         userAccounts -= max_idx;
-        //printf("%s\t|\t%s\t|\t%s\t|\t%lf", userAccounts->lName, userAccounts->fName, userAccounts->CIN, userAccounts->sum);
+        printf("\n%s\t|\t%s\t|\t%s\t|\t%lf", (userAccounts+3)->lName, (userAccounts+3)->fName, (userAccounts+3)->CIN, (userAccounts+3)->sum);
+        //printf("\n%s\t|\t%s\t|\t%s\t|\t%lf", userAccounts->lName, userAccounts->fName, userAccounts->CIN, userAccounts->sum);
         //Display of user accounts in descending order
         for (i = 0; i < currentCount; i++){
             if(userAccounts->sum < minSumToDisplay) break;
