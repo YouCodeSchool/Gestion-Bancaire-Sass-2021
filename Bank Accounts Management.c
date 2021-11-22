@@ -75,11 +75,25 @@ bool operations(){ // Withdraw and deposit operations on accounts
     else if (choice == '3') return true;
     return true;
 }
-void swap(double *ptrSwap1, double *ptrSwap2)
+void swap(struct user *ptrSwap1, struct user *ptrSwap2)
 {
-    double temp = *ptrSwap1;
-    *ptrSwap1 = *ptrSwap2;
-    *ptrSwap2 = temp;
+    char * strTemp; double sumTemp;
+    //swap fName
+    strTemp = ptrSwap1->fName;
+    ptrSwap1->fName = ptrSwap2->fName;
+    ptrSwap2->fName = strTemp;
+    //swap lName
+    strTemp = ptrSwap1->lName;
+    ptrSwap1->lName = ptrSwap2->lName;
+    ptrSwap2->lName = strTemp;
+    //swap CIN
+    strTemp = ptrSwap1->CIN;
+    ptrSwap1->CIN = ptrSwap2->CIN;
+    ptrSwap2->CIN = strTemp;
+    //swamp sum
+    sumTemp = ptrSwap1->sum;
+    ptrSwap1->sum = ptrSwap2->sum;
+    ptrSwap2->sum = sumTemp;
 }
 void selectionSortDouble(char sortBy, double minSumToDisplay, struct user *userAccounts, int currentCount){
     //printf("\n%s\t|\t%s\t|\t%s\t|\t%lf", userAccounts->lName, userAccounts->fName, userAccounts->CIN, userAccounts->sum);
@@ -98,47 +112,50 @@ void selectionSortDouble(char sortBy, double minSumToDisplay, struct user *userA
         for (i = 0; i < currentCount-1; i++){ // we did sizeArr-1 because it is not necessary for i to get to the last element of the array
             min_idx = i;
             for (j = i+1; j < currentCount; j++){
-                if ((userAccounts+min_idx)->sum > (userAccountsStartingPoint+j)->sum);
+                if ((userAccounts+min_idx)->sum > (userAccounts+j)->sum){
                     min_idx = j;
+                }
             }
             userAccounts += min_idx;
-            //userAccounts -= ((currentCount -1) - (j-1)) ; //j-1 is equivalent to currentCount -1??
             userAccountToBeSwaped = userAccountsStartingPoint + i;
-            //userAccounts += min_idx;
-            //userAccounts = userAccountsStartingPoint + min_idx;
-            swap(&userAccountToBeSwaped->sum, &userAccounts->sum);
+
+            swap(userAccountToBeSwaped, userAccounts);
             userAccounts -= min_idx;
         }
         //userAccounts -= min_idx;
         //printf("\n%s\t|\t%s\t|\t%s\t|\t%lf", (userAccounts+3)->lName, (userAccounts+3)->fName, (userAccounts+3)->CIN, (userAccounts+3)->sum);
         //printf("\n%s\t|\t%s\t|\t%s\t|\t%lf", userAccounts->lName, userAccounts->fName, userAccounts->CIN, userAccounts->sum);
+        //test the minimu sum to display if there are any accounts to display
+         if(minSumToDisplay > (userAccounts+currentCount)->sum) {system("cls"); printf("\nLe montant introduit depasse les montants disponible."); return;}
         //Display of user accounts in ascending order
         for (i = 0; i < currentCount; i++){
-            if(userAccountsStartingPoint->sum > minSumToDisplay){
+            if(userAccounts->sum > minSumToDisplay){
                 for (i ; i < currentCount; i++){
-                    printf("\n%s\t|\t%s\t|\t%s\t|\t%lf", userAccountsStartingPoint->lName, userAccountsStartingPoint->fName, userAccountsStartingPoint->CIN, userAccountsStartingPoint->sum);
-                    userAccountsStartingPoint++;
+                    printf("\n%s\t|\t%s\t|\t%s\t|\t%lf", userAccounts->lName, userAccounts->fName, userAccounts->CIN, userAccounts->sum);
+                    userAccounts++;
                 }
                 break;
             }
-            userAccountsStartingPoint++;
+            userAccounts++;
         }
     }
     else if (sortBy == 'd'){
         for (i = 0; i < currentCount-1; i++){
             max_idx = i;
             for (j = i+1; j < currentCount; j++){
-                if (userAccounts->sum < (userAccounts++)->sum);
+                if ((userAccounts+max_idx)->sum < (userAccounts+j)->sum){
                     max_idx = j;
+                }
             }
-            userAccounts -= (j - 1);
-            userAccountToBeSwaped = userAccounts + i;
             userAccounts += max_idx;
-            swap(&userAccountToBeSwaped->sum, &userAccounts->sum);
+            userAccountToBeSwaped = userAccountsStartingPoint + i;
+            swap(userAccountToBeSwaped, userAccounts);
+            userAccounts -= max_idx;
         }
-        userAccounts -= max_idx;
-        printf("\n%s\t|\t%s\t|\t%s\t|\t%lf", (userAccounts+3)->lName, (userAccounts+3)->fName, (userAccounts+3)->CIN, (userAccounts+3)->sum);
+        //printf("\n%s\t|\t%s\t|\t%s\t|\t%lf", (userAccounts+3)->lName, (userAccounts+3)->fName, (userAccounts+3)->CIN, (userAccounts+3)->sum);
         //printf("\n%s\t|\t%s\t|\t%s\t|\t%lf", userAccounts->lName, userAccounts->fName, userAccounts->CIN, userAccounts->sum);
+        //test the minimu sum introduced to display if there are any accounts to display
+         if(minSumToDisplay > (userAccounts)->sum) {system("cls"); printf("\nLe montant introduit depasse les montants disponible."); return;}
         //Display of user accounts in descending order
         for (i = 0; i < currentCount; i++){
             if(userAccounts->sum < minSumToDisplay) break;
