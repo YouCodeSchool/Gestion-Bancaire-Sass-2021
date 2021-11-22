@@ -44,18 +44,18 @@ bool createAccounts(int currentCount, int accountsNum, struct user *pStruct){
     pStruct += currentCount;
 
     for(currentCount ; currentCount < (currentCount + accountsNum); accountsNum--){
-    printf("\nEntrer le nom d'utilisateur de compte :");
-    scanf(" %s", pStruct->lName);
-    //printf("\nYou entered  : %s", pStruct->lName);
-    printf("\nEntrer le prenom d'utilisateur :");
-    scanf(" %s", pStruct->fName);
-    printf("\nEntrer le CIN d'utilisateur :");
-    scanf(" %s", pStruct->CIN);
-    printf("\nEntrer le montant :");
-    scanf(" %lf", &pStruct->sum); //montant as a double
-    system("cls");
-    //printf("\nLe montant : %lf\n", pStruct->sum);
-    pStruct++;
+        printf("\nEntrer le nom d'utilisateur de compte :");
+        scanf(" %s", pStruct->lName);
+        //printf("\nYou entered  : %s", pStruct->lName);
+        printf("\nEntrer le prenom d'utilisateur :");
+        scanf(" %s", pStruct->fName);
+        printf("\nEntrer le CIN d'utilisateur :");
+        scanf(" %s", pStruct->CIN);
+        printf("\nEntrer le montant :");
+        scanf(" %lf", &pStruct->sum); //montant as a double
+        system("cls");
+        //printf("\nLe montant : %lf\n", pStruct->sum);
+        pStruct++;
     }
     /*pStruct--;
     printf("\nfname in first element of array struct fName: %s, lName :  %s,  CIN : %s,  sum : %lf", pStruct->fName, pStruct->lName, pStruct->CIN, pStruct->sum);
@@ -84,6 +84,8 @@ void swap(double *ptrSwap1, double *ptrSwap2)
 void selectionSortDouble(char sortBy, double minSumToDisplay, struct user *userAccounts, int currentCount){
     struct user *userAccountToBeSwaped;
     int i, j, min_idx, max_idx;
+    //affichage
+    printf("\nNom\t|\tPrenom\t|\tCIN\t|\tMontant");
     if(sortBy == 'a') {
         for (i = 0; i < currentCount-1; i++){ // we did sizeArr-1 because it is not necessary for i to get to the last element of the array
             min_idx = i;
@@ -98,6 +100,17 @@ void selectionSortDouble(char sortBy, double minSumToDisplay, struct user *userA
         }
         userAccounts -= min_idx;
         //printf("%s\t|\t%s\t|\t%s\t|\t%lf", userAccounts->lName, userAccounts->fName, userAccounts->CIN, userAccounts->sum);
+        //Display of user accounts in ascending order
+        for (i = 0; i < currentCount; i++){
+            if(userAccounts->sum > minSumToDisplay){
+                for (i ; i < currentCount; i++){
+                    printf("\n%s\t|\t%s\t|\t%s\t|\t%lf", userAccounts->lName, userAccounts->fName, userAccounts->CIN, userAccounts->sum);
+                    userAccounts++;
+                }
+            break;
+            }
+        userAccounts++;
+        }
     }
     else if (sortBy == 'd'){
         for (i = 0; i < currentCount-1; i++){
@@ -113,20 +126,15 @@ void selectionSortDouble(char sortBy, double minSumToDisplay, struct user *userA
         }
         userAccounts -= max_idx;
         //printf("%s\t|\t%s\t|\t%s\t|\t%lf", userAccounts->lName, userAccounts->fName, userAccounts->CIN, userAccounts->sum);
-    }
-    //affichage
-    printf("\nNom\t|\tPrenom\t|\tCIN\t|\tMontant");
-    for (i = 0; i < currentCount; i++){
-        if(userAccounts->sum > minSumToDisplay){
-            for (i ; i < currentCount; i++){
+        //Display of user accounts in descending order
+        for (i = 0; i < currentCount; i++){
+            if(userAccounts->sum < minSumToDisplay) break;
                 printf("\n%s\t|\t%s\t|\t%s\t|\t%lf", userAccounts->lName, userAccounts->fName, userAccounts->CIN, userAccounts->sum);
                 userAccounts++;
             }
-            break;
-        }
-        userAccounts++;
     }
-};
+}
+
 void sortFunction(char *subChoice, char sortBy, double minSumToDisplay, struct user *userAccounts, int currentCount){
     switch(*subChoice){
         case '1':
@@ -228,6 +236,10 @@ void main(){
             repeat = operations();
             break;
         case '4':
+            if(i == 0) {
+                    printf("\nLa base de donnees est vide. Essayer d'introduire des nouveaux comptes.");
+                    break;
+            }
             menuDisplay('a', &choice);
             if(choice == '7') repeat = false;
             repeat = affichage(choice, userAccounts, i);
