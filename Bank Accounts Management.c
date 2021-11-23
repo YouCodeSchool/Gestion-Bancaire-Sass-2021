@@ -116,13 +116,27 @@ void withdraw(struct user *userAccounts, int currentCount){
     accountToWithdrawFrom = search(searchFor, userAccounts, currentCount);
     if(accountToWithdrawFrom == NULL) return;
     printf("\nMontant actuel : %lf", accountToWithdrawFrom->sum);
-    printf("\nEntrer le montant a tirer : \n");
+    printf("\nEntrer le montant a retirer : \n");
     scanf(" %lf", &sumToWithdraw);
     //printf("\nMontant precedent : %lf", accountToWithdrawFrom->sum);
     accountToWithdrawFrom->sum -= sumToWithdraw;
-    printf("\nMontant precedent : %lf", accountToWithdrawFrom->sum);
+    printf("\nNouveau Montant : %lf", accountToWithdrawFrom->sum);
 }
-void deposit(struct user *userAccounts, int currentCount){}
+void deposit(struct user *userAccounts, int currentCount){
+    char *searchFor;
+    double sumToDeposit;
+    struct user* accountToDepositIn;
+    printf("\nEntrer le CIN du compte :");
+    scanf(" %s", searchFor);
+    accountToDepositIn = search(searchFor, userAccounts, currentCount);
+    if(accountToDepositIn == NULL) return;
+    printf("\nMontant actuel : %lf", accountToDepositIn->sum);
+    printf("\nEntrer le montant a deposer :\n");
+    scanf(" %lf", &sumToDeposit);
+    //printf("\nMontant precedent : %lf", accountToWithdrawFrom->sum);
+    accountToDepositIn->sum += sumToDeposit;
+    printf("\nNouveau Montant: %lf", accountToDepositIn->sum);
+}
 
 bool operations(int currentCount, struct user *userAccounts){ // Withdraw and deposit operations on accounts
     char choice;
