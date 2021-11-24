@@ -2,18 +2,6 @@
 #include <stdlib.h> //includes the exit function
 #include <string.h>
 #include <stdbool.h>
-struct user* initiliazeUsersArray(int sizeToAllocate, struct user *userAccounts);
-void menuDisplay(char menu, char *choice);
-void createAccounts(int * currentCount, int accountsNum, struct user *pStruct);
-void selectionSortDouble(bool display, char sortBy, double minSumToDisplay, struct user *userAccounts, int currentCount); // used by search function so it needs to be declared before
-void sortFunction(char *subChoice, char sortBy, double minSumToDisplay, struct user *userAccounts, int currentCount);
-void swap(struct user *ptrSwap1, struct user *ptrSwap2);
-struct user* search(char * searchFor, struct user* userAccounts, int currentCount);
-void withdraw(struct user *userAccounts, int currentCount);
-void deposit(struct user *userAccounts, int currentCount);
-void affichage(char choice, struct user *userAccounts, int currentCount);
-bool operations(int currentCount, struct user *userAccounts);
-void loyalty(struct user* userAccounts, int currentCount);
 
 struct user {
     //char fName[50];
@@ -22,6 +10,22 @@ struct user {
     char *CIN;
     double sum;
 };
+
+struct user* initiliazeUsersArray(int sizeToAllocate, struct user *userAccounts);
+void
+void menuDisplay(char menu, char *choice);
+struct user* search(char * searchFor, struct user* userAccounts, int currentCount);
+void createAccounts(int * currentCount, int accountsNum, struct user *pStruct);
+void selectionSortDouble(bool display, char sortBy, double minSumToDisplay, struct user *userAccounts, int currentCount); // used by search function so it needs to be declared before
+void sortFunction(char *subChoice, char sortBy, double minSumToDisplay, struct user *userAccounts, int currentCount);
+void swap(struct user *ptrSwap1, struct user *ptrSwap2);
+void withdraw(struct user *userAccounts, int currentCount);
+void deposit(struct user *userAccounts, int currentCount);
+void affichage(char choice, struct user *userAccounts, int currentCount);
+bool operations(int currentCount, struct user *userAccounts);
+void loyalty(struct user* userAccounts, int currentCount);
+//void selectionSortString(char sortBy, char *subChoice, struct user* userAccounts, int currentCount);
+
 
 void main(){
     char choice = '6';
@@ -38,7 +42,11 @@ void main(){
     //printf("\n choice : %c", choice);
     switch (choice){
         case '1': //Add 1 account
-            if(i > initialStrucSize) userAccounts = realloc(userAccounts, i); //need to realloc also Nom prenom CIN
+            if(i >= initialStrucSize) {
+                    userAccounts = realloc(userAccounts, (i + 1) * sizeof(struct user)); //need to realloc also Nom prenom CIN
+                    mallo
+
+            }
             createAccounts(&i, accountsNum, userAccounts);
             //if(repeat == false) break; //if CIN already exists then we should not increment i/currentCount
             //i++;
@@ -47,7 +55,7 @@ void main(){
             //accountsNum = 1;
             printf("\nCombien de compte comptes voulez-vous creer?");
             scanf(" %d", &accountsNum);
-            if(i + accountsNum > initialStrucSize) {
+            if(i + accountsNum >= initialStrucSize) {
                 userAccounts = realloc(userAccounts, i + accountsNum);
             }
             createAccounts(&i, accountsNum, userAccounts);
@@ -84,6 +92,24 @@ void main(){
     exit(0);
 }
 
+struct user* initiliazeUsersArray(int sizeToAllocate, struct user *userAccounts){
+    int i = 0;
+    userAccounts = malloc(sizeToAllocate * sizeof(struct user)); // de don't need to explicitly cast return type of malloc unless we want to run by C++ compiler
+    if(userAccounts == NULL) {printf("\nMemory not allocated for user accounts"); return NULL;}
+    struct user *startingPoint = userAccounts;
+    for(i; i < sizeToAllocate; i++){
+        userAccounts->fName = malloc((50 + 1) * sizeof(char));  //+1 is consider the terminating character of strings \0
+        if(userAccounts->fName == NULL){printf("\nMemory not allocated for fName"); return NULL;}
+        userAccounts->lName = malloc((50 + 1) * sizeof(char));
+        if(userAccounts->lName == NULL) {("\nMemory not allocated for lName"); return NULL;}
+        userAccounts->CIN = malloc((50 + 1)* sizeof(char));
+        if(userAccounts->CIN == NULL){printf("\nMemory not allocated for CIN"); return NULL;}
+        //we don't need to call malloc again for sum because it is not a pointer to something
+        userAccounts++;
+    }
+
+    return startingPoint;
+}
 void menuDisplay(char menu, char *choice){  //menu can take p (for principal menu), o(opérations), a(affichage), f(fidélisation)
     //printf("\n choice in menu function %c", *choice);
     printf("\n******** Bank's Accounts Management System *******\n");
@@ -107,6 +133,50 @@ void menuDisplay(char menu, char *choice){  //menu can take p (for principal men
             break;
     }
     system("cls");
+}
+
+void affichage(char choice, struct user *userAccounts, int currentCount){
+    char subChoice;
+    char *searchFor;
+    struct user* accountToSearch;
+    double minSumToDisplay = 0.0;
+    switch(choice){
+        case '1': //Trier en ascendant
+            printf("\nTrier en ascendant par :\n1. Montant \n2. Nom \n3. Prenom\n");
+            scanf(" %c", &subChoice);
+            sortFunction(&subChoice, 'a', minSumToDisplay, userAccounts, currentCount); //Pass the sub choice and the operation to perform ascending or descending
+            break;
+        case '2': //Trier en descendant
+            printf("\nTrier en descendant par :\n1. Montant \n2. Nom \n3. Prenom\n");
+            scanf(" %c", &subChoice);
+            sortFunction(&subChoice, 'd', minSumToDisplay, userAccounts, currentCount); //Pass the sub choice and the operation to perform ascending or descending
+            break;
+        case '3':  // Montant > ? Ordre Ascendant
+            printf("\nEntrer le montant minimum a afficher\n");
+            scanf(" %lf", &minSumToDisplay);
+            subChoice = '1';
+            sortFunction(&subChoice, 'a', minSumToDisplay, userAccounts, currentCount);
+            break;
+        case '4': // Montant > ? Ordre Descendant
+            printf("\nEntrer le montant minimum a afficher\n");
+            scanf(" %lf", &minSumToDisplay);
+            subChoice = '1';
+            sortFunction(&subChoice, 'd', minSumToDisplay, userAccounts, currentCount);
+            break;
+        case '5': // Recherche par CIN
+            printf("\nEntrer le CIN a rechercher :\n");
+            scanf(" %s", searchFor);
+            accountToSearch = search(searchFor, userAccounts, currentCount);
+            if(accountToSearch == NULL) break;
+            printf("\nNom\t|\tPrenom\t|\tCIN\t|\tMontant");
+            printf("\n%s\t|\t%s\t|\t%s\t|\t%lf", accountToSearch->lName, accountToSearch->fName, accountToSearch->CIN, accountToSearch->sum);
+            break;
+        case '6': //Retourn to principal menu
+            system("cls");
+            break;
+
+    }
+    return;
 }
 
 void createAccounts(int * currentCount, int accountsNum, struct user *pStruct){
@@ -138,35 +208,6 @@ void createAccounts(int * currentCount, int accountsNum, struct user *pStruct){
     //printf("\ncurrentCount after : %d", *currentCount);
     return;
 }
-void selectionSortString(char sortBy, char *subChoice, struct user* userAccounts, int currentCount){
-    int i, min_idx, j;
-    struct user* userAccountsStartingPoint = userAccounts;
-    struct user* userAccountToBeSwaped;
-    if(subChoice == NULL){
-        for (i = 0; i < currentCount; i++){
-            min_idx = i;
-            for (j = i+1; j < currentCount; j++){
-                if (*(userAccounts+min_idx)->CIN > *(userAccounts+j)->CIN){
-                        min_idx = j;
-                }
-            }
-            userAccounts += min_idx;
-            userAccountToBeSwaped = userAccountsStartingPoint + i;
-
-            swap(userAccountToBeSwaped, userAccounts);
-            userAccounts -= min_idx;
-        }
-        //Affichage to check if CIN selection works
-        for (i = 0; i < currentCount; i++){
-            printf("\n%s\t|\t%s\t|\t%s\t|\t%lf", userAccounts->lName, userAccounts->fName, userAccounts->CIN, userAccounts->sum);
-            userAccounts++;
-        }
-    }
-    else if (*subChoice == '2'){ // sort by Nom
-
-    }
-    else if(*subChoice == '3') {} //sort by Prénom
-}
 
 struct user* search(char * searchFor, struct user* userAccounts, int currentCount){
     int i;
@@ -186,14 +227,11 @@ void withdraw(struct user *userAccounts, int currentCount){
     struct user* accountToWithdrawFrom;
     printf("\nEntrer le CIN du compte : ");
     scanf(" %s", searchFor);
-    printf("\nsearchFor : %s", searchFor);
     accountToWithdrawFrom = search(searchFor, userAccounts, currentCount);
-    printf("\nsearchFor  : %s", searchFor);
     if(accountToWithdrawFrom == NULL) return;
     printf("\nMontant actuel : %lf", accountToWithdrawFrom->sum);
     printf("\nEntrer le montant a retirer : \n");
     scanf(" %lf", &sumToWithdraw);
-    //printf("\nMontant precedent : %lf", accountToWithdrawFrom->sum);
     accountToWithdrawFrom->sum -= sumToWithdraw;
     printf("\nNouveau Montant : %lf", accountToWithdrawFrom->sum);
 }
@@ -317,49 +355,7 @@ void sortFunction(char *subChoice, char sortBy, double minSumToDisplay, struct u
             break;
     }
 }
-void affichage(char choice, struct user *userAccounts, int currentCount){
-    char subChoice;
-    char *searchFor;
-    struct user* accountToSearch;
-    double minSumToDisplay = 0.0;
-    switch(choice){
-        case '1': //Trier en ascendant
-            printf("\nTrier en ascendant par :\n1. Montant \n2. Nom \n3. Prenom\n");
-            scanf(" %c", &subChoice);
-            sortFunction(&subChoice, 'a', minSumToDisplay, userAccounts, currentCount); //Pass the sub choice and the operation to perform ascending or descending
-            break;
-        case '2': //Trier en descendant
-            printf("\nTrier en descendant par :\n1. Montant \n2. Nom \n3. Prenom\n");
-            scanf(" %c", &subChoice);
-            sortFunction(&subChoice, 'd', minSumToDisplay, userAccounts, currentCount); //Pass the sub choice and the operation to perform ascending or descending
-            break;
-        case '3':  // Montant > ? Ordre Ascendant
-            printf("\nEntrer le montant minimum a afficher\n");
-            scanf(" %lf", &minSumToDisplay);
-            subChoice = '1';
-            sortFunction(&subChoice, 'a', minSumToDisplay, userAccounts, currentCount);
-            break;
-        case '4': // Montant > ? Ordre Descendant
-            printf("\nEntrer le montant minimum a afficher\n");
-            scanf(" %lf", &minSumToDisplay);
-            subChoice = '1';
-            sortFunction(&subChoice, 'd', minSumToDisplay, userAccounts, currentCount);
-            break;
-        case '5': // Recherche par CIN
-            printf("\nEntrer le CIN a rechercher :\n");
-            scanf(" %s", searchFor);
-            accountToSearch = search(searchFor, userAccounts, currentCount);
-            if(accountToSearch == NULL) break;
-            printf("\nNom\t|\tPrenom\t|\tCIN\t|\tMontant");
-            printf("\n%s\t|\t%s\t|\t%s\t|\t%lf", accountToSearch->lName, accountToSearch->fName, accountToSearch->CIN, accountToSearch->sum);
-            break;
-        case '6': //Retourn to principal menu
-            system("cls");
-            break;
 
-    }
-    return;
-}
 void loyalty(struct user* userAccounts, int currentCount){ //fidélisation des clients
     char choice;
     int i;
@@ -367,36 +363,53 @@ void loyalty(struct user* userAccounts, int currentCount){ //fidélisation des cl
     if(currentCount <= 3) numAccounts = currentCount; //This will be helpfun when the database is empty or there are less than 3 accounts
     selectionSortDouble(false, 'd', 0.0, userAccounts, currentCount);
     system("cls"); //to clear the printed provided by the selectionSortDouble function
+    if(currentCount == 0) return;
     printf("\nLes 3 comptes ayant le montant le plus superieur : ");
     printf("\nNom\t|\tPrenom\t|\tCIN\t|\tMontant");
     for(i = 0; i < numAccounts; i++){
         printf("\n%s\t|\t%s\t|\t%s\t|\t%lf", (userAccounts+i)->lName, (userAccounts+i)->fName, (userAccounts+i)->CIN, (userAccounts+i)->sum);
     }
-    if(currentCount == 0) return;
+    //if(currentCount == 0) return;
     printf("\nVoulez vous ajouter 1.3 pourcent a ces comptes? Y/N");
     scanf(" %c", &choice);
+    printf("\nNom\t|\tPrenom\t|\tCIN\t|\tMontant");
     if (choice == 'y' || choice == 'Y'){
         for(i = 0; i < numAccounts; i++){
             (userAccounts+i)->sum += (userAccounts+i)->sum * (1.3/100);
+            printf("\n%s\t|\t%s\t|\t%s\t|\t%lf", (userAccounts+i)->lName, (userAccounts+i)->fName, (userAccounts+i)->CIN, (userAccounts+i)->sum);
         }
     }
 }
 
-struct user* initiliazeUsersArray(int sizeToAllocate, struct user *userAccounts){
-    int i = 0;
-    userAccounts = malloc(sizeToAllocate * sizeof(struct user)); // de don't need to explicitly cast return type of malloc unless we want to run by C++ compiler
-    if(userAccounts == NULL) {printf("\nMemory not allocated for user accounts"); return NULL;}
-    struct user *startingPoint = userAccounts;
-    for(i; i < sizeToAllocate; i++){
-        userAccounts->fName = malloc((50 + 1) * sizeof(char));  //+1 is consider the terminating character of strings \0
-        if(userAccounts->fName == NULL){printf("\nMemory not allocated for fName"); return NULL;}
-        userAccounts->lName = malloc((50 + 1) * sizeof(char));
-        if(userAccounts->lName == NULL) {("\nMemory not allocated for lName"); return NULL;}
-        userAccounts->CIN = malloc((50 + 1)* sizeof(char));
-        if(userAccounts->CIN == NULL){printf("\nMemory not allocated for CIN"); return NULL;}
-        //we don't need to call malloc again for sum because it is not a pointer to something
-        userAccounts++;
-    }
 
-    return startingPoint;
+/*
+void selectionSortString(char sortBy, char *subChoice, struct user* userAccounts, int currentCount){
+    int i, min_idx, j;
+    struct user* userAccountsStartingPoint = userAccounts;
+    struct user* userAccountToBeSwaped;
+    if(subChoice == NULL){
+        for (i = 0; i < currentCount; i++){
+            min_idx = i;
+            for (j = i+1; j < currentCount; j++){
+                if (*(userAccounts+min_idx)->CIN > *(userAccounts+j)->CIN){
+                        min_idx = j;
+                }
+            }
+            userAccounts += min_idx;
+            userAccountToBeSwaped = userAccountsStartingPoint + i;
+
+            swap(userAccountToBeSwaped, userAccounts);
+            userAccounts -= min_idx;
+        }
+        //Affichage to check if CIN selection works
+        for (i = 0; i < currentCount; i++){
+            printf("\n%s\t|\t%s\t|\t%s\t|\t%lf", userAccounts->lName, userAccounts->fName, userAccounts->CIN, userAccounts->sum);
+            userAccounts++;
+        }
+    }
+    else if (*subChoice == '2'){ // sort by Nom
+
+    }
+    else if(*subChoice == '3') {} //sort by Prénom
 }
+*/
