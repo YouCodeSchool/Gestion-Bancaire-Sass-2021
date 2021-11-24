@@ -12,7 +12,7 @@ struct user {
 };
 
 struct user* initiliazeUsersArray(int sizeToAllocate, struct user *userAccounts);
-void
+struct user* memoryReallocation(struct user *userAccounts, int accountsNum, int currentCount);
 void menuDisplay(char menu, char *choice);
 struct user* search(char * searchFor, struct user* userAccounts, int currentCount);
 void createAccounts(int * currentCount, int accountsNum, struct user *pStruct);
@@ -32,7 +32,7 @@ void main(){
     int i = 0;
     int accountsNum;
     bool repeat = true;
-    int initialStrucSize = 20; //use i value and compare it to initialStrucSize to know if we need to realloc userAccounts struct array
+    int initialStrucSize = 1; //use i value and compare it to initialStrucSize to know if we need to realloc userAccounts struct array
                                 //i is used also to follow users order of input
     struct user *userAccounts = initiliazeUsersArray(initialStrucSize, userAccounts);
 
@@ -43,9 +43,8 @@ void main(){
     switch (choice){
         case '1': //Add 1 account
             if(i >= initialStrucSize) {
-                    userAccounts = realloc(userAccounts, (i + 1) * sizeof(struct user)); //need to realloc also Nom prenom CIN
-                    mallo
-
+                //userAccounts = realloc(userAccounts, (i + accountsNum) * sizeof(struct user)); //need to realloc also Nom prenom CIN
+                userAccounts = memoryReallocation(userAccounts, accountsNum, i);
             }
             createAccounts(&i, accountsNum, userAccounts);
             //if(repeat == false) break; //if CIN already exists then we should not increment i/currentCount
@@ -56,7 +55,8 @@ void main(){
             printf("\nCombien de compte comptes voulez-vous creer?");
             scanf(" %d", &accountsNum);
             if(i + accountsNum >= initialStrucSize) {
-                userAccounts = realloc(userAccounts, i + accountsNum);
+                //userAccounts = realloc(userAccounts, i + accountsNum);
+                userAccounts = memoryReallocation(userAccounts, accountsNum, i);
             }
             createAccounts(&i, accountsNum, userAccounts);
             //printf("\nAccounts num when > 1  : %d", accountsNum);
@@ -109,6 +109,20 @@ struct user* initiliazeUsersArray(int sizeToAllocate, struct user *userAccounts)
     }
 
     return startingPoint;
+}
+struct user* memoryReallocation(struct user *userAccounts, int accountsNum, int currentCount){
+    int i = 0;
+    userAccounts = realloc(userAccounts, (currentCount + accountsNum)* sizeof(struct user));
+    //for( i = currentCount;  i < currentCount + accountsNum; i++){
+    for(i = 0; i < accountsNum; i++){
+        (userAccounts+currentCount+i)->fName = malloc((50 + 1) * sizeof(char)); // we can use the accountsNum here too and it works only it starts from last element
+        (userAccounts+currentCount+i)->lName = malloc((50 + 1) * sizeof(char));
+        (userAccounts+currentCount+i)->CIN = malloc((50 + 1) * sizeof(char));
+        //(userAccounts+i)->fName = malloc((50 + 1) * sizeof(char)); // we can use the accountsNum here too and it works only it starts from last element
+        //(userAccounts+i)->lName = malloc((50 + 1) * sizeof(char));
+        //(userAccounts+i)->CIN = malloc((50 + 1) * sizeof(char));
+    }
+    return userAccounts;
 }
 void menuDisplay(char menu, char *choice){  //menu can take p (for principal menu), o(opérations), a(affichage), f(fidélisation)
     //printf("\n choice in menu function %c", *choice);
@@ -211,7 +225,6 @@ void createAccounts(int * currentCount, int accountsNum, struct user *pStruct){
 
 struct user* search(char * searchFor, struct user* userAccounts, int currentCount){
     int i;
-    printf("\nCurrent coun inside search function : ");
     for(i = 0; i < currentCount; i++){
         if(!strcmp(searchFor, (userAccounts+i)->CIN)){
             return userAccounts+i;
