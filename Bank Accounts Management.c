@@ -2,7 +2,7 @@
 #include <stdlib.h> //includes the exit function
 #include <string.h>
 #include <stdbool.h>
-
+#include <conio.h>
 struct user {
     //char fName[50];
     char *fName;
@@ -27,7 +27,7 @@ void loyalty(struct user* userAccounts, int currentCount);
 
 void main(){
     char choice = '6';
-    int i = 0;
+    int i = 0, j;
     int accountsNum;
     bool repeat = true;
     int initialStrucSize = 1; //use i value and compare it to initialStrucSize to know if we need to realloc userAccounts struct array
@@ -41,8 +41,6 @@ void main(){
     switch (choice){
         case '1': //Add 1 account
             if(i >= 1) {
-                //userAccounts = realloc(userAccounts, (i + accountsNum) * sizeof(struct user)); //need to realloc also Nom prenom CIN
-            //if(i > 0) { userAccounts = memoryReallocation(userAccounts, accountsNum, i); }
                 userAccounts = memoryReallocation(userAccounts, accountsNum, i);
             }
             createAccounts(&i, accountsNum, userAccounts);
@@ -52,12 +50,10 @@ void main(){
             scanf(" %d", &accountsNum);
           //  if(i + accountsNum >= initialStrucSize) {
             //if(accountsNum > 1) {
-            //if(i > 0) userAccounts = memoryReallocation(userAccounts, accountsNum, i);
             userAccounts = memoryReallocation(userAccounts, accountsNum, i);
+            //userAccounts = memoryReallocation(userAccounts, accountsNum, i);
             //}
             createAccounts(&i, accountsNum, userAccounts);
-            //printf("\nAccounts num when > 1  : %d", accountsNum);
-            //i += accountsNum;
             break;
         case '3': //operations
             repeat = operations(i, userAccounts);
@@ -73,7 +69,6 @@ void main(){
             affichage(choice, userAccounts, i);
             break;
         case '5': //fidélisation
-
             loyalty(userAccounts, i);
             break;
         case '6': //Quitter l'appplication
@@ -83,9 +78,11 @@ void main(){
     }while(repeat);
 
     free(userAccounts);
-    free(userAccounts->fName);
-    free(userAccounts->lName);
-    free(userAccounts->CIN);
+    for(j=0; j < i+1 ; j++){
+        free((userAccounts+j)->fName);
+        free((userAccounts+j)->lName);
+        free((userAccounts+j)->CIN);
+    }
     exit(0);
 }
 
@@ -93,36 +90,31 @@ struct user* initiliazeUsersArray(int sizeToAllocate, struct user *userAccounts)
     int i = 0;
     userAccounts = malloc(sizeToAllocate * sizeof(struct user)); // de don't need to explicitly cast return type of malloc unless we want to run by C++ compiler
     if(userAccounts == NULL) {printf("\nMemory not allocated for user accounts"); return NULL;}
-    struct user *startingPoint = userAccounts;
+    //struct user *startingPoint = userAccounts;
     for(i; i < sizeToAllocate; i++){
-        userAccounts->fName = malloc((50 + 1) * sizeof(char));  //+1 is consider the terminating character of strings \0
-        if(userAccounts->fName == NULL){printf("\nMemory not allocated for fName"); return NULL;}
-        userAccounts->lName = malloc((50 + 1) * sizeof(char));
-        if(userAccounts->lName == NULL) {("\nMemory not allocated for lName"); return NULL;}
-        userAccounts->CIN = malloc((50 + 1)* sizeof(char));
-        if(userAccounts->CIN == NULL){printf("\nMemory not allocated for CIN"); return NULL;}
+        (userAccounts+i)->fName = malloc((50 + 1) * sizeof(char));  //+1 is consider the terminating character of strings \0
+        if((userAccounts+i)->fName == NULL){printf("\nMemory not allocated for fName"); return NULL;}
+        (userAccounts+i)->lName = malloc((50 + 1) * sizeof(char));
+        if((userAccounts+i)->lName == NULL) {("\nMemory not allocated for lName"); return NULL;}
+        (userAccounts+i)->CIN = malloc((50 + 1)* sizeof(char));
+        if((userAccounts+i)->CIN == NULL){printf("\nMemory not allocated for CIN"); return NULL;}
         //we don't need to call malloc again for sum because it is not a pointer to something
-        userAccounts++;
+        //userAccounts++;
     }
-
-    return startingPoint;
+    //return startingPoint;
+    return userAccounts;
 }
 struct user* memoryReallocation(struct user *userAccounts, int accountsNum, int currentCount){
     int i = 0;
     userAccounts = realloc(userAccounts, (currentCount + accountsNum)* sizeof(struct user));
-    //for( i = currentCount;  i < currentCount + accountsNum; i++){
-    for(i = 0; i < accountsNum; i++){
+    for(i = 0; i <accountsNum; i++){
         (userAccounts+currentCount+i)->fName = malloc((50 + 1) * sizeof(char)); // we can use the accountsNum here too and it works only it starts from last element
         (userAccounts+currentCount+i)->lName = malloc((50 + 1) * sizeof(char));
         (userAccounts+currentCount+i)->CIN = malloc((50 + 1) * sizeof(char));
-        //(userAccounts+i)->fName = malloc((50 + 1) * sizeof(char)); // we can use the accountsNum here too and it works only it starts from last element
-        //(userAccounts+i)->lName = malloc((50 + 1) * sizeof(char));
-        //(userAccounts+i)->CIN = malloc((50 + 1) * sizeof(char));
     }
     return userAccounts;
 }
 void menuDisplay(char menu, char *choice){  //menu can take p (for principal menu), o(opérations), a(affichage), f(fidélisation)
-    //printf("\n choice in menu function %c", *choice);
     printf("\n******** Bank's Accounts Management System *******\n");
     switch(menu)
     {
@@ -178,7 +170,7 @@ void affichage(char choice, struct user *userAccounts, int currentCount){
             printf("\nEntrer le CIN a rechercher :\n");
             scanf(" %s", searchFor);
             accountToSearch = search(searchFor, userAccounts, currentCount);
-            if(accountToSearch == NULL) break;
+            if(accountToSearch == NULL) {printf("\nCIN introuvable"); break;}
             printf("\nNom\t|\tPrenom\t|\tCIN\t|\tMontant");
             printf("\n%s\t|\t%s\t|\t%s\t|\t%lf", accountToSearch->lName, accountToSearch->fName, accountToSearch->CIN, accountToSearch->sum);
             break;
@@ -191,32 +183,33 @@ void affichage(char choice, struct user *userAccounts, int currentCount){
 }
 
 void createAccounts(int * currentCount, int accountsNum, struct user *pStruct){
-    //printf("\ncurrentCount : %d, and accountsNum to add is : %d ", currentCount, accountsNum);
-    int i = accountsNum; //store the actual accountsNum provided by the user
-    struct user *ptrStartOfStructArray = pStruct;
-    //struct user *ptr;
-    pStruct += (*currentCount);
+    //int i = accountsNum; //store the actual accountsNum provided by the user
+    int i = (*currentCount);
+    int maxCount = (*currentCount) + accountsNum;
 
-    for(*currentCount ; *currentCount < (*currentCount + i); i--){
+    for(i ; i < maxCount; i++){
         printf("\nEntrer le CIN d'utilisateur :");
-        scanf(" %s", pStruct->CIN);
+        scanf(" %s", (pStruct+i)->CIN);
         //search if CIN already exists
-        //ptr = search((pStruct->CIN), ptrStartOfStructArray, *currentCount);
-        if(search((pStruct->CIN), ptrStartOfStructArray, *currentCount) != NULL) break;
+        if(search(((pStruct+i)->CIN), pStruct, *currentCount) != NULL) {
+            printf("\nCIN deja exist, essayer avec un autre");
+            i--;
+            continue;
+        }
         printf("\nEntrer le nom d'utilisateur de compte :");
-        scanf(" %s", pStruct->lName);
+        scanf(" %s", (pStruct+i)->lName);
         //printf("\nYou entered  : %s", pStruct->lName);
         printf("\nEntrer le prenom d'utilisateur :");
-        scanf(" %s", pStruct->fName);
+        scanf(" %s", (pStruct+i)->fName);
+        printf("\n prenom is %s", (pStruct+i)->fName);
         printf("\nEntrer le montant :");
-        scanf(" %lf", &pStruct->sum); //montant as a double
+        scanf(" %lf", &(pStruct+i)->sum); //montant as a double
+        printf("\n sum is %lf", (pStruct+i)->sum);
+        getch();
         system("cls");
-        //printf("\nLe montant : %lf\n", pStruct->sum);
-        pStruct++;
+        //pStruct++;
+        (*currentCount) += 1;
     }
-    //printf("\ncurrentCount before : %d", *currentCount);
-    *currentCount += accountsNum - i;
-    //printf("\ncurrentCount after : %d", *currentCount);
     return;
 }
 
@@ -224,10 +217,10 @@ struct user* search(char * searchFor, struct user* userAccounts, int currentCoun
     int i;
     for(i = 0; i < currentCount; i++){
         if(!strcmp(searchFor, (userAccounts+i)->CIN)){
-            return userAccounts+i;
+            return (userAccounts+i);
         }
     }
-    printf("\nCe CIN ne figure pas dans la base de donnees. Vous pouvez ajouter un compte avec ce CIN.");
+    printf("\nCe CIN ne figure pas dans la base de donnees. Vous pouvez ajouter un compte avec ce CIN.\n");
     return NULL;
 
 }
@@ -264,8 +257,14 @@ void deposit(struct user *userAccounts, int currentCount){
 bool operations(int currentCount, struct user *userAccounts){ // Withdraw and deposit operations on accounts
     char choice;
     menuDisplay('o', &choice);
-    if(choice == '1') withdraw(userAccounts, currentCount);
-    else if (choice == '2') deposit(userAccounts, currentCount);
+    if(choice == '1') {
+        if(currentCount == 0) printf("\nBase de donnees est vide.");
+        else withdraw(userAccounts, currentCount);
+    }
+    else if (choice == '2') {
+        if(currentCount == 0) printf("\nBase de donnees est vide.");
+        else deposit(userAccounts, currentCount);
+    }
     else if (choice == '4') return false;
     return true;
 }
@@ -296,6 +295,8 @@ void selectionSortDouble(bool display, char sortBy, double minSumToDisplay, stru
     //affichage
     printf("\nNom\t|\tPrenom\t|\tCIN\t|\tMontant");
     if(sortBy == 'a') {
+        //test the minimu sum to display if there are any accounts to display
+        if(minSumToDisplay > (userAccounts+currentCount)->sum) {system("cls"); printf("\nLe montant introduit depasse les montants disponible."); return;}
         for (i = 0; i < currentCount-1; i++){ // we did sizeArr-1 because it is not necessary for i to get to the last element of the array
             min_idx = i;
             for (j = i+1; j < currentCount; j++){
@@ -309,8 +310,7 @@ void selectionSortDouble(bool display, char sortBy, double minSumToDisplay, stru
             swap(userAccountToBeSwaped, userAccounts);
             userAccounts -= min_idx;
         }
-        //test the minimu sum to display if there are any accounts to display
-         if(minSumToDisplay > (userAccounts+currentCount)->sum) {system("cls"); printf("\nLe montant introduit depasse les montants disponible."); return;}
+
         //Display of user accounts in ascending order
         if(display){
             for (i = 0; i < currentCount; i++){
@@ -326,6 +326,8 @@ void selectionSortDouble(bool display, char sortBy, double minSumToDisplay, stru
         }
     }
     else if (sortBy == 'd'){
+        //test the minimu sum introduced to display if there are any accounts to display
+        if(minSumToDisplay > (userAccounts)->sum) {system("cls"); printf("\nLe montant introduit depasse les montants disponible."); return;}
         for (i = 0; i < currentCount-1; i++){
             max_idx = i;
             for (j = i+1; j < currentCount; j++){
@@ -338,10 +340,8 @@ void selectionSortDouble(bool display, char sortBy, double minSumToDisplay, stru
             swap(userAccountToBeSwaped, userAccounts);
             userAccounts -= max_idx;
         }
-        //printf("\n%s\t|\t%s\t|\t%s\t|\t%lf", (userAccounts+3)->lName, (userAccounts+3)->fName, (userAccounts+3)->CIN, (userAccounts+3)->sum);
-        //printf("\n%s\t|\t%s\t|\t%s\t|\t%lf", userAccounts->lName, userAccounts->fName, userAccounts->CIN, userAccounts->sum);
         //test the minimu sum introduced to display if there are any accounts to display
-         if(minSumToDisplay > (userAccounts)->sum) {system("cls"); printf("\nLe montant introduit depasse les montants disponible."); return;}
+        //if(minSumToDisplay > (userAccounts)->sum) {system("cls"); printf("\nLe montant introduit depasse les montants disponible."); return;}
         //Display of user accounts in descending order
         if(display){
             for (i = 0; i < currentCount; i++){
@@ -379,7 +379,6 @@ void loyalty(struct user* userAccounts, int currentCount){ //fidélisation des cl
     for(i = 0; i < numAccounts; i++){
         printf("\n%s\t|\t%s\t|\t%s\t|\t%lf", (userAccounts+i)->lName, (userAccounts+i)->fName, (userAccounts+i)->CIN, (userAccounts+i)->sum);
     }
-    //if(currentCount == 0) return;
     printf("\nVoulez vous ajouter 1.3 pourcent a ces comptes? Y/N");
     scanf(" %c", &choice);
     printf("\nNom\t|\tPrenom\t|\tCIN\t|\tMontant");
