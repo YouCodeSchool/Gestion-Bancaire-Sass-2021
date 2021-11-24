@@ -10,7 +10,6 @@ struct user {
     char *CIN;
     double sum;
 };
-
 struct user* initiliazeUsersArray(int sizeToAllocate, struct user *userAccounts);
 struct user* memoryReallocation(struct user *userAccounts, int accountsNum, int currentCount);
 void menuDisplay(char menu, char *choice);
@@ -25,7 +24,6 @@ void affichage(char choice, struct user *userAccounts, int currentCount);
 bool operations(int currentCount, struct user *userAccounts);
 void loyalty(struct user* userAccounts, int currentCount);
 //void selectionSortString(char sortBy, char *subChoice, struct user* userAccounts, int currentCount);
-
 
 void main(){
     char choice = '6';
@@ -42,22 +40,21 @@ void main(){
     //printf("\n choice : %c", choice);
     switch (choice){
         case '1': //Add 1 account
-            if(i >= initialStrucSize) {
+            if(i >= 1) {
                 //userAccounts = realloc(userAccounts, (i + accountsNum) * sizeof(struct user)); //need to realloc also Nom prenom CIN
+            //if(i > 0) { userAccounts = memoryReallocation(userAccounts, accountsNum, i); }
                 userAccounts = memoryReallocation(userAccounts, accountsNum, i);
             }
             createAccounts(&i, accountsNum, userAccounts);
-            //if(repeat == false) break; //if CIN already exists then we should not increment i/currentCount
-            //i++;
             break;
         case '2': //Add multiple accounts
-            //accountsNum = 1;
             printf("\nCombien de compte comptes voulez-vous creer?");
             scanf(" %d", &accountsNum);
-            if(i + accountsNum >= initialStrucSize) {
-                //userAccounts = realloc(userAccounts, i + accountsNum);
-                userAccounts = memoryReallocation(userAccounts, accountsNum, i);
-            }
+          //  if(i + accountsNum >= initialStrucSize) {
+            //if(accountsNum > 1) {
+            //if(i > 0) userAccounts = memoryReallocation(userAccounts, accountsNum, i);
+            userAccounts = memoryReallocation(userAccounts, accountsNum, i);
+            //}
             createAccounts(&i, accountsNum, userAccounts);
             //printf("\nAccounts num when > 1  : %d", accountsNum);
             //i += accountsNum;
@@ -376,7 +373,7 @@ void loyalty(struct user* userAccounts, int currentCount){ //fidélisation des cl
     if(currentCount <= 3) numAccounts = currentCount; //This will be helpfun when the database is empty or there are less than 3 accounts
     selectionSortDouble(false, 'd', 0.0, userAccounts, currentCount);
     system("cls"); //to clear the printed provided by the selectionSortDouble function
-    if(currentCount == 0) return;
+    if(currentCount == 0) {printf("\nBase de donnnees est vide "); return;}
     printf("\nLes 3 comptes ayant le montant le plus superieur : ");
     printf("\nNom\t|\tPrenom\t|\tCIN\t|\tMontant");
     for(i = 0; i < numAccounts; i++){
