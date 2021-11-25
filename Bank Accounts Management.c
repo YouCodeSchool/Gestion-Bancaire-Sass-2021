@@ -272,8 +272,14 @@ void deposit(struct user *userAccounts, int currentCount){
 bool operations(int currentCount, struct user *userAccounts){ // Withdraw and deposit operations on accounts
     char choice;
     menuDisplay('o', &choice);
-    if(choice == '1') withdraw(userAccounts, currentCount);
-    else if (choice == '2') deposit(userAccounts, currentCount);
+    if(choice == '1') {
+            if(currentCount != 0) withdraw(userAccounts, currentCount);
+            else printf("\nBase de donnees est vide");
+    }
+    else if (choice == '2') {
+            if(currentCount != 0) deposit(userAccounts, currentCount);
+            else printf("\nBase de donnees est vide");
+    }
     else if (choice == '4') return false;
     return true;
 }
@@ -318,7 +324,7 @@ void selectionSortDouble(bool display, char sortBy, double minSumToDisplay, stru
             userAccounts -= min_idx;
         }
         //test the minimu sum to display if there are any accounts to display
-         if(minSumToDisplay > (userAccounts+currentCount)->sum) {system("cls"); printf("\nLe montant introduit depasse les montants disponible."); return;}
+         if(minSumToDisplay > (userAccounts+currentCount-1)->sum) {system("cls"); printf("\nLe montant introduit depasse les montants disponible."); return;}
         //Display of user accounts in ascending order
         if(display){
             for (i = 0; i < currentCount; i++){
