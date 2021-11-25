@@ -205,7 +205,11 @@ void createAccounts(int * currentCount, int accountsNum, struct user *pStruct){
         scanf(" %s", pStruct->CIN);
         //search if CIN already exists
         //ptr = search((pStruct->CIN), ptrStartOfStructArray, *currentCount);
-        if(search((pStruct->CIN), ptrStartOfStructArray, *currentCount) != NULL) break;
+        if(search((pStruct->CIN), ptrStartOfStructArray, *currentCount) != NULL) {
+                printf("\nCe CIN exist deja. Essayer avec un autre ");
+                i++;
+                continue;
+        }
         printf("\nEntrer le nom d'utilisateur de compte :");
         scanf(" %s", pStruct->lName);
         //printf("\nYou entered  : %s", pStruct->lName);
@@ -216,9 +220,10 @@ void createAccounts(int * currentCount, int accountsNum, struct user *pStruct){
         system("cls");
         //printf("\nLe montant : %lf\n", pStruct->sum);
         pStruct++;
+        (*currentCount)+= 1;
     }
     //printf("\ncurrentCount before : %d", *currentCount);
-    *currentCount += accountsNum - i;
+    //*currentCount += accountsNum - i;
     //printf("\ncurrentCount after : %d", *currentCount);
     return;
 }
